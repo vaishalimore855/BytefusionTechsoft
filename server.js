@@ -1,104 +1,39 @@
-/***********************************Create the Server *********************** */
-// const http = require('http');
+// app.js or server.js
 
-// const hostname = '127.0.0.1';
-// const port = 3000;
+const express = require('express');
+const mongoose = require('mongoose');
+const Tour = require('./models/tourModel');
 
-// const server = http.createServer((req, res) => {
-//   res.statusCode = 200;
-//   res.setHeader('Content-Type', 'text/plain');
-//   res.end('Hello, World!\n');
-// });
+const app = express();
+app.use(express.json());
 
-// server.listen(port, hostname, () => {
-//   console.log(`Server running at http://${hostname}:${port}/`);
-// });
+const uri = 'mongodb://localhost:27017/tourDB';
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Connection error', err));
 
-/***********************************Routing using http module************************/
-// const http = require('http');
+const createTour = async () => {
+  try {
+    const newTour = await Tour.create({
+      name: 'The Forest Hiker',
+      duration: 5,
+      maxGroupSize: 25,
+      difficulty: 'easy',
+      price: 497,
+      summary: 'Breathtaking hike through the Canadian Banff National Park',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
+      imageCover: 'tour-1-cover.jpg',
+      images: ['tour-1-1.jpg', 'tour-1-2.jpg', 'tour-1-3.jpg'],
+      startDates: ['2022-03-05', '2022-05-10', '2022-06-15']
+    });
+    console.log('Tour created:', newTour);
+  } catch (error) {
+    console.error('Error creating tour:', error);
+  }
+};
 
-// const hostname = '127.0.0.1';
-// const port = 3000;
+createTour();
 
-// const server = http.createServer((req, res) => {
-//   res.statusCode = 200;
-//   res.setHeader('Content-Type', 'text/plain');
-
-//   if (req.url === '/' && req.method === 'GET') {
-//     res.end('Hello, World!\n');
-//   } else if (req.url === '/about' && req.method === 'GET') {
-//     res.end('About us page\n');
-//   } else if (req.url === '/contact' && req.method === 'GET') {
-//     res.end('Contact us page\n');
-//   } else {
-//     res.statusCode = 404;
-//     res.end('Not Found\n');
-//   }
-// });
-
-// server.listen(port, hostname, () => {
-//   console.log(`Server running at http://${hostname}:${port}/`);
-// });
-
-
-
-/*********************************** * Building a very simple API:*******************/
-
-// 1.using http module
-// const http = require('http');
-
-// const hostname = '127.0.0.1';
-// const port = 3000;
-
-// const server = http.createServer((req, res) => {
-//   res.setHeader('Content-Type', 'application/json');
-//   if (req.url === '/api' && req.method === 'GET') {
-//     res.statusCode = 200;
-//     res.end(JSON.stringify({ message: 'Hello, this is your API!' }));
-//   } else {
-//     res.statusCode = 404;
-//     res.end(JSON.stringify({ message: 'Not Found' }));
-//   }
-// });
-
-// server.listen(port, hostname, () => {
-//   console.log(`Server running at http://${hostname}:${port}/`);
-// });
-
-/********************************using express**************************************/
-// const express = require('express');
-// const app = express();
-// const port = 3000;
-
-// app.get('/api', (req, res) => {
-//   res.json({ message: 'Hello, this is your API!' });
-// });
-
-// app.use((req, res) => {
-//   res.status(404).json({ message: 'Not Found' });
-// });
-
-// app.listen(port, () => {
-//   console.log(`Server running at http://localhost:${port}/`);
-// });
-
-
-
-/********************************Parsing the variable from URLs************************ */
-const http = require('http');
-const url = require('url');
-
-const server = http.createServer((req, res) => {
-  const parsedUrl = url.parse(req.url, true);
-  const productId = parsedUrl.pathname.split('/')[2];
-  const queryParameters = parsedUrl.query;
-
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end(`Product ID: ${productId}, Query Parameters: ${JSON.stringify(queryParameters)}`);
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
 });
-
-const port = 3000;
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
-});
-/********************************************************************** */
