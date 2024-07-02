@@ -1,0 +1,7 @@
+[
+  { "name": "Tour 1", "duration": 5, "difficulty": "easy", "price": 500, "ratingsAverage": 4.7 },
+  { "name": "Tour 2", "duration": 8, "difficulty": "medium", "price": 800, "ratingsAverage": 4.5 },
+  { "name": "Tour 3", "duration": 3, "difficulty": "easy", "price": 300, "ratingsAverage": 4.8 },
+  { "name": "Tour 4", "duration": 10, "difficulty": "difficult", "price": 1000, "ratingsAverage": 4.9 },
+  { "name": "Tour 5", "duration": 7, "difficulty": "medium", "price": 700, "ratingsAverage": 4.6 }
+]
