@@ -1,16 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
+const dotenv = require('dotenv');
 const AppError = require('./utills/appError');
 const globalErrorHandler = require('./middleware/errorHandler');
 const tourRouter = require('./routes/tourRoutes');
+
+dotenv.config({ path: './config.env' });
 
 const app = express();
 
 app.use(express.json());
 app.use(morgan('dev'));
 
-const DB = 'mongodb://localhost:27017/tourDB';
+const DB = process.env.DB;
 mongoose.connect(DB, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -28,7 +31,7 @@ app.all('*', (req, res, next) => {
 app.use(globalErrorHandler);
 
 // Start the server
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
