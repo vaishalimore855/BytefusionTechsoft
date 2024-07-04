@@ -39,7 +39,11 @@ async function insertSampleUser() {
         await user.save();
         console.log('Sample user inserted');
     } catch (error) {
-        console.error('Error inserting sample user:', error);
+        if (error.code === 11000) {
+            console.log('Sample user already exists');
+        } else {
+            console.error('Error inserting sample user:', error);
+        }
     }
 }
 
@@ -50,7 +54,11 @@ app.post('/users', async (req, res) => {
         await user.save();
         res.status(201).send(user);
     } catch (error) {
-        res.status(400).send(error);
+        if (error.code === 11000) {
+            res.status(400).send({ error: 'Duplicate field value entered' });
+        } else {
+            res.status(400).send(error);
+        }
     }
 });
 
