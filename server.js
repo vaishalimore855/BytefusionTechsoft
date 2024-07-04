@@ -31,22 +31,32 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 // Function to insert a sample user
+// async function insertSampleUser() {
+//     try {
+//         const user = new User({
+//             name: 'John Doe',
+//             email: 'john@example.com'
+//         });
+//         await user.save();
+//         console.log('Sample user inserted');
+//     } catch (error) {
+//         console.error('Error inserting sample user:', error);
+//     }
+// }
 async function insertSampleUser() {
     try {
+        throw new Error('Test unhandled rejection');
         const user = new User({
             name: 'John Doe',
-            email: 'john@example.'
+            email: 'john@example.com'
         });
         await user.save();
         console.log('Sample user inserted');
     } catch (error) {
-        if (error.name === 'ValidationError') {
-            console.error('Validation Error:', error.message);
-        } else {
-            console.error('Error inserting sample user:', error);
-        }
+        console.error('Error inserting sample user:', error);
     }
 }
+
 
 // Routes
 app.post('/users', async (req, res) => {
@@ -55,16 +65,18 @@ app.post('/users', async (req, res) => {
         await user.save();
         res.status(201).send(user);
     } catch (error) {
-        if (error.name === 'ValidationError') {
-            const errors = Object.values(error.errors).map(err => err.message);
-            res.status(400).send({ errors });
-        } else {
-            res.status(400).send(error);
-        }
+        res.status(400).send(error);
     }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+});
+
+// Global handler for unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // You can decide to exit the process or keep it running
+    // process.exit(1); // Uncomment to exit the process
 });
