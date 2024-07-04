@@ -18,12 +18,13 @@ mongoose.connect('mongodb://localhost:27017/mydatabase', {
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
+        required: [true, 'Name is required'],
     },
     email: {
         type: String,
-        required: true,
+        required: [true, 'Email is required'],
         unique: true,
+        match: [/.+\@.+\..+/, 'Please fill a valid email address'],
     }
 });
 
@@ -34,13 +35,13 @@ async function insertSampleUser() {
     try {
         const user = new User({
             name: 'John Doe',
-            email: 'john@example.com'
+            email: 'john@example.'
         });
         await user.save();
         console.log('Sample user inserted');
     } catch (error) {
-        if (error.code === 11000) {
-            console.log('Sample user already exists');
+        if (error.name === 'ValidationError') {
+            console.error('Validation Error:', error.message);
         } else {
             console.error('Error inserting sample user:', error);
         }
@@ -54,29 +55,12 @@ app.post('/users', async (req, res) => {
         await user.save();
         res.status(201).send(user);
     } catch (error) {
-        if (error.code === 11000) {
-            res.status(400).send({ error: 'Duplicate field value entered' });
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            res.status(400).send({ errors });
         } else {
             res.status(400).send(error);
         }
-    }
-});
-
-// Handle invalid MongoDB IDs
-app.get('/users/:id', async (req, res) => {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).send({ error: 'Invalid ID' });
-    }
-
-    try {
-        const user = await User.findById(id);
-        if (!user) {
-            return res.status(404).send({ error: 'User not found' });
-        }
-        res.send(user);
-    } catch (error) {
-        res.status(500).send(error);
     }
 });
 
