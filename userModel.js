@@ -1,28 +1,7 @@
-// const mongoose = require('mongoose');
-
-// const userSchema = new mongoose.Schema({
-//   name: {
-//     type: String,
-//     required: true,
-//   },
-//   email: {
-//     type: String,
-//     required: true,
-//     unique: true,
-//   },
-//   age: {
-//     type: Number,
-//     required: true,
-//   },
-// });
-
-// const User = mongoose.model('User', userSchema);
-
-// module.exports = User;
-
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -42,6 +21,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 });
+
 // Hash the password before saving the user
 userSchema.pre('save', async function (next) {
   if (this.isModified('password') || this.isNew) {
@@ -60,6 +40,12 @@ userSchema.pre('save', async function (next) {
 // Method to compare password for authentication
 userSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
+};
+
+// Method to generate JWT token
+userSchema.methods.generateAuthToken = function () {
+  const token = jwt.sign({ _id: this._id, email: this.email }, 'secretKey', { expiresIn: '1h' });
+  return token;
 };
 
 const User = mongoose.model('User', userSchema);

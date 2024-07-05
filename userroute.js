@@ -1,74 +1,6 @@
-// const express = require('express');
-// const User = require('../models/userModel');
-// const router = express.Router();
-
-// // Create a new user
-// router.post('/', async (req, res) => {
-//   try {
-//     const user = new User(req.body);
-//     await user.save();
-//     res.status(201).send(user);
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// });
-
-// // Get all users
-// router.get('/', async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     res.status(200).send(users);
-//   } catch (error) {
-//     res.status(500).send(error);
-//   }
-// });
-
-// // Get a user by ID
-// router.get('/:id', async (req, res) => {
-//   try {
-//     const user = await User.findById(req.params.id);
-//     if (!user) {
-//       return res.status(404).send();
-//     }
-//     res.status(200).send(user);
-//   } catch (error) {
-//     res.status(500).send(error);
-//   }
-// });
-
-// // Update a user by ID
-// router.put('/:id', async (req, res) => {
-//   try {
-//     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-//       new: true,
-//       runValidators: true,
-//     });
-//     if (!user) {
-//       return res.status(404).send();
-//     }
-//     res.status(200).send(user);
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// });
-
-// // Delete a user by ID
-// router.delete('/:id', async (req, res) => {
-//   try {
-//     const user = await User.findByIdAndDelete(req.params.id);
-//     if (!user) {
-//       return res.status(404).send();
-//     }
-//     res.status(200).send(user);
-//   } catch (error) {
-//     res.status(500).send(error);
-//   }
-// });
-
-// module.exports = router;
-
 const express = require('express');
-const User = require('../models/userModel'); // Update path if necessary
+const User = require('../models/userModel');
+const auth = require('../middleware/auth');
 const router = express.Router();
 
 // Create a new user
@@ -91,7 +23,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Example route for user login
+// User login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -106,10 +38,16 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
 
-    res.status(200).json({ message: 'Login successful', user });
+    const token = user.generateAuthToken();
+    res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
+});
+
+// Example of a protected route
+router.get('/me', auth, async (req, res) => {
+  res.send(req.user);
 });
 
 module.exports = router;
