@@ -22,7 +22,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// Hash the password before saving the user
 userSchema.pre('save', async function (next) {
   if (this.isModified('password') || this.isNew) {
     try {
@@ -37,12 +36,10 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// Method to compare password for authentication
 userSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Method to generate JWT token
 userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign({ _id: this._id, email: this.email }, 'secretKey', { expiresIn: '1h' });
   return token;
