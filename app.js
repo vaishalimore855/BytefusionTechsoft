@@ -32,9 +32,9 @@ app.get('/protected', auth, (req, res) => {
 // Create a user using axios (example usage)
 const createUser = async () => {
   try {
-    const response = await axios.post('http://localhost:3000/users', {
-      name: 'Rutuja Pandit',
-      email: 'rutuja@example.com',
+    const response = await axios.post('http://localhost:3000/users/signup', {
+      name: 'Mohini Navale',
+      email: 'mohini@example.com',
       age: 30,
       password: 'securepassword123', // Add password field
     });

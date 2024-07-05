@@ -3,8 +3,7 @@ const User = require('../models/userModel');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
-// Create a new user
-router.post('/', async (req, res) => {
+router.post('/signup', async (req, res) => {
   try {
     const { name, email, age, password } = req.body;
 
@@ -12,18 +11,16 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Password is required' });
     }
 
-    // Create a new user with the password
     const newUser = new User({ name, email, age, password });
 
-    // Save the new user to the database
     await newUser.save();
-    res.status(201).json(newUser);
+    const token = newUser.generateAuthToken();
+    res.status(201).json({ user: newUser, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
 
-// User login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -45,7 +42,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Example of a protected route
 router.get('/me', auth, async (req, res) => {
   res.send(req.user);
 });
