@@ -11,8 +11,8 @@ const router = express.Router();
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-    user: 'your-email@gmail.com', // Replace with your email
-    pass: 'your-email-password', // Replace with your email password
+    user: 'arun@gmail.com', // Replace with your email
+    pass: '$2b$10$CK1xz81EfpJhq38gVosP0ug8axzaACuB42VEs65eHwi6e3Chw4gr1', // Replace with your email password
   },
 });
 
@@ -32,7 +32,7 @@ router.post('/forgot-password', async (req, res) => {
     const resetURL = `http://${req.headers.host}/users/reset-password/${user.resetPasswordToken}`;
     const mailOptions = {
       to: user.email,
-      from: 'your-email@gmail.com', // Replace with your email
+      from: 'arun@gmail.com', // Replace with your email
       subject: 'Password Reset',
       text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
       Please click on the following link, or paste this into your browser to complete the process:\n\n
