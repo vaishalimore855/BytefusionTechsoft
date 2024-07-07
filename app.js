@@ -25,6 +25,7 @@ app.use('/users', userRoutes);
 
 // Example of a protected route
 const auth = require('./middleware/auth');
+const authorize = require('./middleware/authorize');
 app.get('/protected', auth, (req, res) => {
   res.send('This is a protected route');
 });
@@ -33,10 +34,11 @@ app.get('/protected', auth, (req, res) => {
 const createUser = async () => {
   try {
     const response = await axios.post('http://localhost:3000/users/signup', {
-      name: 'Shital Khose',
-      email: 'shitalkhose@example.com',
+      name: 'Admin User',
+      email: 'admin@example.com',
       age: 30,
-      password: 'securepassword123',
+      password: 'adminpassword123',
+      role: 'admin',
     });
     console.log('User created:', response.data);
   } catch (error) {

@@ -20,31 +20,26 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
 });
-
 userSchema.pre('save', async function (next) {
-  if (this.isModified('password') || this.isNew) {
-    try {
-      const salt = await bcrypt.genSalt(10);
-      this.password = await bcrypt.hash(this.password, salt);
-      next();
-    } catch (error) {
-      next(error);
-    }
-  } else {
-    next();
+  const user = this;
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
   }
+  next();
 });
-
-userSchema.methods.comparePassword = function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
-};
-
 userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign({ _id: this._id, email: this.email }, 'secretKey', { expiresIn: '1h' });
+  const user = this;
+  const token = jwt.sign({ _id: user._id.toString(), role: user.role }, 'secretKey');
   return token;
 };
-
+userSchema.methods.comparePassword = async function (password) {
+  return bcrypt.compare(password, this.password);
+};
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;
