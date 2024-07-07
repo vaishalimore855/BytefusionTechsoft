@@ -4,34 +4,22 @@ const auth = require('../middleware/auth');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 
-// Update user password
-router.post('/update-password', auth, async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
+// Update user data
+router.patch('/update', auth, async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ['name', 'email', 'age'];
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
 
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ error: 'Current and new password are required.' });
-    }
-
-    const user = await User.findById(req.user._id);
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found.' });
-    }
-
-    const isMatch = await user.comparePassword(currentPassword);
-
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Current password is incorrect.' });
-    }
-
-    user.password = newPassword;
+  if (!isValidOperation) {
+    return res.status(400).json({ error: 'Invalid updates!' });
+  }
+try {
+    const user = req.user;
+    updates.forEach(update => user[update] = req.body[update]);
     await user.save();
-
-    res.status(200).json({ message: 'Password updated successfully.' });
+    res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(400).json({ error: error.message });
   }
 });
-
 module.exports = router;
