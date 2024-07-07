@@ -7,6 +7,7 @@ const port = 3000;
 
 app.use(bodyParser.json()); // Middleware
 
+// MongoDB connection
 mongoose.connect('mongodb://localhost:27017/node-mongodb-app', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -18,19 +19,22 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
+// Import routes
 const userRoutes = require('./routes/userroute');
 app.use('/users', userRoutes);
 
+// Example of a protected route
 const auth = require('./middleware/auth');
 app.get('/protected', auth, (req, res) => {
   res.send('This is a protected route');
 });
 
+// Create a user using axios (example usage)
 const createUser = async () => {
   try {
     const response = await axios.post('http://localhost:3000/users/signup', {
-      name: 'Shital Repale',
-      email: 'shital@example.com',
+      name: 'Shital Khose',
+      email: 'shitalkhose@example.com',
       age: 30,
       password: 'securepassword123',
     });
@@ -43,6 +47,7 @@ const createUser = async () => {
 // Uncomment this line to create a user on server start (for demonstration purposes)
 createUser();
 
+// Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
