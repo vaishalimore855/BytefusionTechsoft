@@ -25,7 +25,6 @@ app.use('/users', userRoutes);
 
 // Example of a protected route
 const auth = require('./middleware/auth');
-const authorize = require('./middleware/authorize');
 app.get('/protected', auth, (req, res) => {
   res.send('This is a protected route');
 });
