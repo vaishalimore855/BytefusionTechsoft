@@ -30,25 +30,6 @@ app.get('/protected', auth, (req, res) => {
   res.send('This is a protected route');
 });
 
-// Create a user using axios (example usage)
-const createUser = async () => {
-  try {
-    const response = await axios.post('http://localhost:3000/users/signup', {
-      name: 'Admin User',
-      email: 'admin@example.com',
-      age: 30,
-      password: 'adminpassword123',
-      role: 'admin',
-    });
-    console.log('User created:', response.data);
-  } catch (error) {
-    console.error('Error creating user:', error.response ? error.response.data : error.message);
-  }
-};
-
-// Uncomment this line to create a user on server start (for demonstration purposes)
-createUser();
-
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

@@ -2,49 +2,80 @@ const express = require('express');
 const User = require('../models/userModel');
 const auth = require('../middleware/auth');
 const authorize = require('../middleware/authorize');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 const router = express.Router();
 
-router.post('/signup', async (req, res) => {
-  try {
-    const { name, email, age, password, role } = req.body;
+// Configure nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'your-email@gmail.com',
+    pass: 'your-email-password',
+  },
+});
 
-    if (!password) {
+// Request password reset
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ error: 'No account with that email address exists.' });
+    }
+
+    user.generatePasswordReset();
+    await user.save();
+
+    const resetURL = `http://${req.headers.host}/users/reset-password/${user.resetPasswordToken}`;
+    const mailOptions = {
+      to: user.email,
+      from: 'your-email@gmail.com',
+      subject: 'Password Reset',
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+      Please click on the following link, or paste this into your browser to complete the process:\n\n
+      ${resetURL}\n\n
+      If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    };
+
+    transporter.sendMail(mailOptions, (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error sending email. Please try again later.' });
+      }
+      res.status(200).json({ message: 'Password reset link sent to email.' });
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Reset password
+router.post('/reset-password/:token', async (req, res) => {
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: req.params.token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Password reset token is invalid or has expired.' });
+    }
+
+    if (!req.body.password) {
       return res.status(400).json({ error: 'Password is required' });
     }
 
-    const newUser = new User({ name, email, age, password, role });
-    await newUser.save();
-    const token = newUser.generateAuthToken();
-    res.status(201).json({ user: newUser, token });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
 
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid email or password' });
-    }
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid email or password' });
-    }
-    const token = user.generateAuthToken();
-    res.status(200).json({ message: 'Login successful', token });
+    res.status(200).json({ message: 'Password has been reset.' });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
-});
-// Protected route for users with 'admin' role
-router.get('/admin', auth, authorize('admin'), (req, res) => {
-  res.send('This is an admin-only route');
-});
-// Protected route for any authenticated user
-router.get('/me', auth, (req, res) => {
-  res.send(req.user);
 });
 
 module.exports = router;
