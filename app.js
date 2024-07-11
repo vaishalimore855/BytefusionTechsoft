@@ -1,25 +1,30 @@
+// app.js
 const express = require('express');
-const helmet = require('helmet');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.use(helmet({                // Use Helmet to set various HTTP headers for security
-  contentSecurityPolicy: {
-      directives: {
-          defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "'unsafe-inline'"],
-          styleSrc: ["'self'", 'https://example.com'],
-          imgSrc: ["'self'", 'data:']
-      } },
-  hsts: {
-      maxAge: 31536000, // 1 year
-      includeSubDomains: true,
-      preload: true
-  },
-  referrerPolicy: { policy: 'no-referrer' }
-}));
-app.get('/', (req, res) => {
-    res.send('Hello, world!');
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch(err => {
+    console.error('Failed to connect to MongoDB', err);
 });
+
+// Middleware
+app.use(express.json());
+
+// Routes
+const userRoutes = require('./routes/userroute');
+app.use('/api/users', userRoutes);
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-})
+});
