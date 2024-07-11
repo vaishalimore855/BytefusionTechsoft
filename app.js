@@ -18,8 +18,8 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 app.use(express.json());
 
-const placeRoutes = require('./routes/place');
-app.use('/api/places', placeRoutes);
+const tourGuideRoutes = require('./routes/tourGuide');
+app.use('/api/tourGuides', tourGuideRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
