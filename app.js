@@ -1,56 +1,49 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SECRET_KEY = 'your_secret_key'; // Replace with your secret key
 
-app.use(express.json());
-app.use(cookieParser());
-
-// Middleware to protect routes
-function authenticateToken(req, res, next) {
-    const token = req.cookies.jwt;
-    if (!token) return res.sendStatus(401); // Unauthorized
-
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-        if (err) return res.sendStatus(403); // Forbidden
-        req.user = user;
-        next();
-    });
-}
-
-// Route to login and issue JWT
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    // Replace with real authentication logic
-    if (username === 'user' && password === 'password') {
-        const user = { name: username };
-        const token = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' });
-
-        // Set JWT in HttpOnly cookie
-        res.cookie('jwt', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-        });
-
-        res.json({ message: 'Logged in successfully' });
-    } else {
-        res.status(401).json({ message: 'Invalid credentials' });
-    }
+// Define rate limiting middleware
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-// Protected route
-app.get('/protected', authenticateToken, (req, res) => {
-    res.json({ message: 'This is a protected route', user: req.user });
+// Apply rate limiting middleware to all requests
+app.use(limiter);
+
+app.get('/', (req, res) => {
+    res.send('Hello, world!');
 });
 
-// Route to logout
-app.post('/logout', (req, res) => {
-    res.clearCookie('jwt');
-    res.json({ message: 'Logged out successfully' });
+app.get('/api', (req, res) => {
+    res.json({ message: 'This is the API endpoint' });
 });
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50, // Limit each IP to 50 requests per `window` (here, per 15 minutes)
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 requests per `window` (here, per 15 minutes)
+});
+
+// Apply the rate limiting middleware to specific routes
+app.use('/api/', apiLimiter);
+app.use('/auth/', authLimiter);
+
+app.get('/api/data', (req, res) => {
+  res.json({ message: 'This is the API data endpoint' });
+});
+
+app.post('/auth/login', (req, res) => {
+  res.json({ message: 'This is the login endpoint' });
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
