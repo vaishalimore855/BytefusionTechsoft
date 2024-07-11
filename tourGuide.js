@@ -1,50 +1,25 @@
-const express = require('express');
-const TourGuide = require('../models/tourGuide');
+const mongoose = require('mongoose');
 
-const router = express.Router();
-
-// Create a new tour guide
-router.post('/', async (req, res) => {
-    try {
-        const newTourGuide = new TourGuide(req.body);
-        const savedTourGuide = await newTourGuide.save();
-        res.status(201).json(savedTourGuide);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
+// Define the Tour schema
+const tourSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    duration: { type: Number, required: true }, // in hours
+    price: { type: Number, required: true },
+    location: {
+        type: { type: String, enum: ['Point'], required: true },
+        coordinates: { type: [Number], required: true }
+    },
+    date: { type: Date, required: true }
 });
 
-// Add a tour to a tour guide
-router.post('/:id/tours', async (req, res) => {
-    try {
-        const tourGuide = await TourGuide.findById(req.params.id);
-        if (!tourGuide) return res.status(404).json({ message: 'Tour guide not found' });
-
-        tourGuide.tours.push(req.body);
-        await tourGuide.save();
-
-        res.status(201).json(tourGuide);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
+// Define the TourGuide schema with embedded Tour documents
+const tourGuideSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    age: { type: Number, required: true },
+    tours: [tourSchema] // Embedding tours
 });
 
-// Find tour guides with tours near a given location
-router.get('/near', async (req, res) => {
-    const { lat, lng, maxDistance } = req.query;
-    try {
-        const tourGuides = await TourGuide.find({
-            'tours.location': {
-                $near: {
-                    $geometry: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
-                    $maxDistance: parseFloat(maxDistance)
-                }
-            }
-        });
-        res.status(200).json(tourGuides);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
+// Create a 2dsphere index on the location field of tours
+tourSchema.index({ location: '2dsphere' });
 
-module.exports = router;
+module.exports = mongoose.model('TourGuide', tourGuideSchema);

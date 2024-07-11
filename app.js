@@ -19,7 +19,12 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use(express.json());
 
 const tourGuideRoutes = require('./routes/tourGuide');
+const tourRoutes = require('./routes/tour');
+const reviewRoutes = require('./routes/review');
+
 app.use('/api/tourGuides', tourGuideRoutes);
+app.use('/api/tours', tourRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
