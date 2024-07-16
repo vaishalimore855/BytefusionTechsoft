@@ -1,0 +1,16 @@
+// views/layouts/base.pug
+doctype html
+html
+    head
+        title= title
+        link(rel='stylesheet', href='/styles.css')
+    body
+        header
+            h1 My Website
+            nav
+                ul
+                    li: a(href='/') Home
+                    li: a(href='/about') About
+        block content
+        footer
+            p © 2024 My Website
