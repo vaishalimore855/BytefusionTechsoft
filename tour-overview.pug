@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  .tour-overview
+    h2 Our Tours
+    .tour-list
+      each tour in tours
+        .tour-card
+          img(src=`/img/${tour.image}`, alt=`Image of ${tour.name}`)
+          h3= tour.name
+          p Duration: #{tour.duration}
+          p Difficulty: #{tour.difficulty}
+          p Price: $#{tour.price}
+          p= tour.summary
