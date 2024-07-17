@@ -1,0 +1,10 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/css/styles.css')
+  body
+    include includes/_header.pug
+    block content
+    include includes/_footer.pug
+    script(src='/js/scripts.js')

@@ -1,28 +1,21 @@
-// app.js
 const express = require('express');
 const path = require('path');
+
 const app = express();
-const port = 3000;
 
-// Set 'views' directory for any views
-app.set('views', path.join(__dirname, 'views'));
-
-// Set Pug as the templating engine
+// Set view engine
 app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Define routes
+// Routes
 app.get('/', (req, res) => {
-    res.render('index', { title: 'Home', message: 'Hello, Pug!' });
+  res.render('index', { title: 'Home' });
 });
 
-app.get('/about', (req, res) => {
-    res.render('about', { title: 'About' });
-});
-
-// Start the server
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
