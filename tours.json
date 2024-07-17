@@ -6,6 +6,7 @@
       "difficulty": "medium",
       "price": 297,
       "summary": "Breathtaking hike through the Canadian Rockies",
+      "description": "Experience the lush forests and serene landscapes...",
       "image": "forest.jpg"
     },
     {
@@ -15,6 +16,7 @@
       "difficulty": "easy",
       "price": 497,
       "summary": "Exploring the beautiful beaches of California",
+      "description": "Enjoy the sunny beaches and crystal clear waters...",
       "image": "sea.jpg"
     }
   ]

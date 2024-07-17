@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  .tour
+    h2= tour.name
+    img(src=`/img/${tour.image}`, alt=`Image of ${tour.name}`)
+    p Duration: #{tour.duration}
+    p Difficulty: #{tour.difficulty}
+    p Price: $#{tour.price}
+    p= tour.description
