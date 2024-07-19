@@ -7,6 +7,12 @@ dotenv.config();
 
 const app = express();
 
+// Middleware to parse JSON
+app.use(express.json());
+
+// Middleware to parse form data
+app.use(express.urlencoded({ extended: true }));
+
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
