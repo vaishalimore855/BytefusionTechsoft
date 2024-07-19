@@ -1,22 +1,16 @@
 const express = require('express');
 const path = require('path');
-const indexRouter = require('./routes/index');
-const toursRouter = require('./routes/tours');
+const dotenv = require('dotenv');
+const uploadRouter = require('./routes/upload');
+
+dotenv.config();
 
 const app = express();
-
-// Set view engine
-app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'views'));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Use routes
-app.use('/', indexRouter);
-app.use('/tours', toursRouter);
+// Routes
+app.use('/api/v1/upload', uploadRouter);
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+module.exports = app;
