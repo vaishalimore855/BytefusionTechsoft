@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title Tour Image Upload Form
+  body
+    h1 Upload Images for Tour
+    form(action="/api/v1/tours/upload" method="POST" enctype="multipart/form-data")
+      label(for="name") Tour Name:
+      input(type="text" id="name" name="name" required)
+      
+      label(for="description") Description:
+      textarea(id="description" name="description" required)
+      
+      label(for="images") Choose images:
+      input(type="file" id="images" name="images" accept="image/*" multiple required)
+      
+      button(type="submit") Upload Images

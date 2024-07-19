@@ -1,12 +1,13 @@
-// routes/tourRoutes.js
-
 const express = require('express');
-const tourController = require('../controllers/tourController');
+const tourController = require('../controllers/tourcontroller');
 
 const router = express.Router();
 
-router
-  .route('/tour-stats')
-  .get(tourController.getTourStats);
+router.post(
+  '/upload',
+  tourController.uploadTourImages,
+  tourController.resizeTourImages,
+  tourController.createTour
+);
 
 module.exports = router;

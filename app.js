@@ -1,9 +1,6 @@
 const express = require('express');
 const path = require('path');
-const dotenv = require('dotenv');
-const uploadRouter = require('./routes/upload');
-
-dotenv.config();
+const tourRouter = require('./routes/tourRoutes');
 
 const app = express();
 
@@ -16,7 +13,16 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Set up view engine
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
 // Routes
-app.use('/api/v1/upload', uploadRouter);
+app.use('/api/v1/tours', tourRouter);
+
+// Render the form
+app.get('/form', (req, res) => {
+  res.render('form');
+});
 
 module.exports = app;
